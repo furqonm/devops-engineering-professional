@@ -8,7 +8,7 @@ _[DISCLAIMER] Links dan materials yang ada disini dipergunakan untuk tambahan ma
 - [AWS Certified Developer - Associate 2020 (PASS THE EXAM!)](https://www.youtube.com/watch?v=RrKRN9zRBWs&ab_channel=freeCodeCamp.org) **(Unofficial)**
 - [AWS SysOps Administrator Associate 2020 (PASS THE EXAM!)](https://www.youtube.com/watch?v=KX_AfyrhlgQ&ab_channel=freeCodeCamp.org) **(Unofficial)**
 
-    > Video material dari Andrew Brown (ExamPro) di freecodecamp. Meskipun materinya levelnya Associate, kita bisa belajar terkait dengan service yang dikenalkan dikelas AWS level Profesional.
+    > Video material dari Andrew Brown (ExamPro) di freecodecamp. Meskipun materinya levelnya Associate, kita bisa belajar terkait dengan service yang dikenalkan dikelas AWS level profesional.
 
 ### 2. Exam Guide
 - [AWS Certified DevOps Engineer – Professional Exam Guide
@@ -66,7 +66,7 @@ _[DISCLAIMER] Links dan materials yang ada disini dipergunakan untuk tambahan ma
 - [Amazon Elastic Kubernetes Service (EKS) Primer](https://explore.skillbuilder.aws/learn/course/internal/view/elearning/57/amazon-elastic-kubernetes-service-eks-primer)
 - [Amazon Elastic Container Service (ECS) Primer](https://explore.skillbuilder.aws/learn/course/internal/view/elearning/57/amazon-elastic-kubernetes-service-eks-primer)
 
-    > Video material dari Programmer Zaman Now dan official AWS di AWS SkillBuilder. Silahkan dipelajari untuk memperkuat konsep dasar tentang container dan Kubernetes.
+    > Video material dari Programmer Zaman Now dan yang official di AWS SkillBuilder. Silahkan dipelajari untuk memperkuat konsep dasar tentang container dan Kubernetes.
 
 ### 3. Infrastructure as Code (IAC)
 - [HashiCorp Terraform Associate Certification Course - Pass the Exam!](https://www.youtube.com/watch?v=V4waklkBC38&ab_channel=freeCodeCamp.org) **(Unofficial)**
