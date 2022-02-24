@@ -10,7 +10,6 @@ _[DISCLAIMER] Links dan materials yang ada disini dipergunakan untuk tambahan ma
 
     > Video material dari Andrew Brown (ExamPro) di freecodecamp. Meskipun materinya levelnya Associate, kita bisa belajar terkait dengan service yang dikenalkan dikelas AWS level Profesional.
 
-
 ### 2. Exam Guide
 - [AWS Certified DevOps Engineer – Professional Exam Guide
 ](https://d1.awsstatic.com/training-and-certification/docs-devops-pro/AWS-Certified-DevOps-Engineer-Professional_Exam-Guide.pdf)
@@ -56,8 +55,20 @@ _[DISCLAIMER] Links dan materials yang ada disini dipergunakan untuk tambahan ma
 
     > Kumpulan panduan lab yang dikerjakan diakun AWS kita. Harap berhati-hati akan biaya pengeluaran ketika melakukan langkah-langkahnya karena lab ini dikerjakan diakun AWS. Perhatikan langkah terakhir **tear down** atau **clean up** yang menjelaskan apa yang harus diterminate diakun kita.
 
-## Additional Material
-### 1. Infrastructure as Code (IAC)
+## Additional Material (Optional)
+### 1. CI/CD
+- [Jenkins 2021 Masterclass | Step by Step for Beginners | Interview Questions](https://www.youtube.com/watch?v=woMAXn4e8NA&ab_channel=AutomationStepbyStep) **(Unofficial)**
+
+    > Video material dari Raghav Pal di Automation Step by Step. Silahkan dipelajari kalau ingin memperdalam dasar Jenkins CI/CD.
+
+### 2. Container and Kubernetes
+- [Belajar Kubernetes untuk Pemula](https://www.youtube.com/playlist?list=PL-CtdCApEFH8XrWyQAyRd6d_CKwxD8Ime) **(Unofficial)**
+- [Amazon Elastic Kubernetes Service (EKS) Primer](https://explore.skillbuilder.aws/learn/course/internal/view/elearning/57/amazon-elastic-kubernetes-service-eks-primer)
+- [Amazon Elastic Container Service (ECS) Primer](https://explore.skillbuilder.aws/learn/course/internal/view/elearning/57/amazon-elastic-kubernetes-service-eks-primer)
+
+    > Video material dari Programmer Zaman Now dan official AWS di AWS SkillBuilder. Silahkan dipelajari untuk memperkuat konsep dasar tentang container dan Kubernetes.
+
+### 3. Infrastructure as Code (IAC)
 - [HashiCorp Terraform Associate Certification Course - Pass the Exam!](https://www.youtube.com/watch?v=V4waklkBC38&ab_channel=freeCodeCamp.org) **(Unofficial)**
 
-    > Video material dari Andrew Brown (ExamPro) di freecodecamp. Silahkan dipelajari untuk mempelajari Terraform dan mempersiapkan ujian HashiCorp Certified: Terraform Associate.
+    > Video material dari Andrew Brown (ExamPro) di freecodecamp. Silahkan dipelajari kalau ingin memperdalam dasar Terraform, atau bahkan untuk mempersiapkan ujian HashiCorp Certified: Terraform Associate.
