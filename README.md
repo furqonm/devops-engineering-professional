@@ -61,7 +61,7 @@ _[DISCLAIMER] Links dan materials yang ada disini dipergunakan untuk tambahan ma
 - [Jenkins 2021 Masterclass | Step by Step for Beginners | Interview Questions](https://www.youtube.com/watch?v=woMAXn4e8NA&ab_channel=AutomationStepbyStep) **(Unofficial)**
 - [Travis CI](https://www.youtube.com/playlist?list=PLT7ak8zxhXKjVTn3Lwc2MM4eEDfp811ys)
 
-    > Video material dari Automation Step by Step untuk memperdalam dasar Jenkins CI/CD, dan Adam Parkin untuk mempelajari Travis CI.
+    > Video material dari Automation Step by Step untuk mempelajari Jenkins CI/CD, dan Adam Parkin untuk mempelajari Travis CI.
 
 ### 2. Container and Kubernetes
 - [Belajar Kubernetes untuk Pemula](https://www.youtube.com/playlist?list=PL-CtdCApEFH8XrWyQAyRd6d_CKwxD8Ime) **(Unofficial)**
