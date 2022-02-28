@@ -17,15 +17,16 @@ _[DISCLAIMER] Links dan materials yang ada disini dipergunakan untuk tambahan ma
     > Membahas 6 domain/section yang akan ditanyakan diujian. Bisa dicek beberapa poin mana yang tidak dimengerti untuk dipelajari lebih lanjut.
 
 ### 3. Exam Readiness
-- [Exam Readiness: AWS Certified DevOps Engineer – Professional](https://explore.skillbuilder.aws/learn/course/internal/view/elearning/74/exam-readiness-aws-certified-devops-engineer-professional)
+- [Exam Readiness: AWS Certified DevOps Engineer – Professional](https://explore.skillbuilder.aws/learn/course/external/view/elearning/74/exam-readiness-aws-certified-devops-engineer-professional)
 
     > E-learning untuk latihan persiapan ujian DevOps Engineer dari AWS. Materi berisikan eksplorasi topik yang keluar di ujian dan beberapa contoh soal ujian. Untuk mencoba bisa mendaftar menggunakan akun Amazon kita, bukan akun AWS.
 
 - [AWS Certified DevOps Engineer – Professional Sample Exam Questions](https://d1.awsstatic.com/training-and-certification/docs-devops-pro/AWS-Certified-DevOps-Engineer-Professional_Sample-Questions.pdf)
+- [Qubits42 Test, Learn: AWS Certified DevOps Engineer – Professional (DevOps Engineering on AWS)](https://www.qubits42.com/test/3859/1881722) **(Unofficial)**
 
-    > Beberapa contoh soal untuk mengenali format pertanyaan ujian DevOps Engineer nanti.
+    > Beberapa contoh soal untuk mempersiapkan ujian DevOps Engineer.
 
-- [AWS Certification Official Practice Question Sets (English)](https://explore.skillbuilder.aws/learn/course/internal/view/elearning/9153/aws-certification-official-practice-question-sets-english)
+- [AWS Certification Official Practice Question Sets (English)](https://explore.skillbuilder.aws/learn/course/external/view/elearning/9153/aws-certification-official-practice-question-sets-english)
 
     > Simulasi ujian via BenchPrep untuk mengenali format pertanyaan ujian DevOps Engineer nanti. Untuk mencoba bisa mendaftar menggunakan akun Amazon kita, bukan akun AWS.
 
@@ -58,8 +59,9 @@ _[DISCLAIMER] Links dan materials yang ada disini dipergunakan untuk tambahan ma
 ## Additional Material (Optional)
 ### 1. CI/CD
 - [Jenkins 2021 Masterclass | Step by Step for Beginners | Interview Questions](https://www.youtube.com/watch?v=woMAXn4e8NA&ab_channel=AutomationStepbyStep) **(Unofficial)**
+- [Travis CI](https://www.youtube.com/playlist?list=PLT7ak8zxhXKjVTn3Lwc2MM4eEDfp811ys)
 
-    > Video material dari Raghav Pal di Automation Step by Step. Silahkan dipelajari kalau ingin memperdalam dasar Jenkins CI/CD.
+    > Video material dari Automation Step by Step untuk memperdalam dasar Jenkins CI/CD, dan Adam Parkin untuk mempelajari Travis CI.
 
 ### 2. Container and Kubernetes
 - [Belajar Kubernetes untuk Pemula](https://www.youtube.com/playlist?list=PL-CtdCApEFH8XrWyQAyRd6d_CKwxD8Ime) **(Unofficial)**
