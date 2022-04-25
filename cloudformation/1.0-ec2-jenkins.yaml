@@ -51,7 +51,7 @@ Resources:
           service jenkins start
       Tags: 
       - Key: Name
-        Value: MyJenkins
+        Value: Jenkins
       - Key: OS
         Value: Amazon Linux 2
 
@@ -74,7 +74,7 @@ Resources:
         - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
         - arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
         - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
-        - 
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
       Path: "/"
       Tags: 
       - Key: Name
