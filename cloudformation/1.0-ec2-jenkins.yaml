@@ -1,0 +1,148 @@
+Description: >
+  Jenkins CI/CD instance dengan permission ke Code Services.
+# Jenkins merupakan aplikasi open-source yang menyediakan mekanisme continuous integration dan continuous delivery (CI/CD) secara otomatis yang diperlukan oleh developer. Informasi lebih lanjut ada disini https://www.jenkins.io.
+
+#----------------------------------------------------------------------------------------#
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t3.micro
+    AllowedValues:
+      - t3.micro
+      - t3a.small
+      - t3a.medium
+    Description: Select instance type for EC2 instance. The default value is t3.micro.
+
+# User memilih SSH keypair untuk remote ke EC2 instance.
+  SSHKeypair:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Select existing EC2 KeyPair for remote SSH.
+
+#----------------------------------------------------------------------------------------#
+Resources:
+# Buat EC2 instance dengan pilihan AMI, instance type, security group, keypair, user data, dan tag. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html.
+  EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+# Gunakan AMI ID milik Amazon Linux 2 terbaru yang diambil dari System Manager - Parameter Store yang disediakan oleh AWS.
+      ImageId: '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}'
+      InstanceType:
+        Ref: InstanceType
+# Pasang SecurityGroup yang dibuat ke EC2 instance.
+      SecurityGroups:
+        - Ref: SecurityGroup
+# Gunakan SSH keypair yang dipilih oleh user.
+      KeyName:
+        Ref: SSHKeypair
+# Gunakan instance profile yang terhubung dengan IAM role yang dibuat (artinya EC2 memakai IAM role melalui instance profile).
+      IamInstanceProfile:
+        Ref: EC2ProfileforSSM
+      UserData:
+# Download dan install Jenkins kedalam EC2 instance.
+        Fn::Base64: |
+          #!/bin/bash
+          yum update -y     
+          wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
+          rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
+          amazon-linux-extras install epel
+          yum install java-11 -y
+          yum install jenkins -y
+          echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          service jenkins start
+      Tags: 
+      - Key: Name
+        Value: MyJenkins
+      - Key: OS
+        Value: Amazon Linux 2
+
+# Buat IAM role yang membolehkan agar:
+# - SSM agent didalam EC2 bisa dikontrol oleh AWS System Manager.
+# - Jenkins akses CodeCommit, atau CodeBuild dengan akses yang terbatas.
+
+  EC2RoleforSSM:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument: 
+        Statement: 
+          - Effect: Allow
+            Principal: 
+              Service:
+                - ec2.amazonaws.com
+            Action: 
+              - sts:AssumeRole
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+        - arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
+        - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
+        - 
+      Path: "/"
+      Tags: 
+      - Key: Name
+        Value:
+          Fn::Sub: Lab - ${EC2Name} Role
+
+# Buat instance profile yang terhubung dengan IAM role. IAM role tidak akan dipasang secara langsung ke EC2 instance, melainkan instance profile yang akan dipasang. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html.
+  EC2ProfileforSSM:
+    Type: AWS::IAM::InstanceProfile
+    Properties: 
+      Path: "/"
+      Roles: 
+        - Ref: EC2RoleforSSM
+
+
+# Buat elastic IP dan pasang ke EC2 instance. Public IPv4 address ini tidak akan berubah meskipun EC2 instance-nya dimatikan lalu dihidupkan. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-eip.html.
+  EIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId:
+        Ref: EC2
+      Tags: 
+      - Key: Name
+        Value: MyEIP
+
+# Buat security group yang membolehkan akses TCP 8080 (untuk Jenkins), SSH (untuk remote), and ICMP (untuk ping) bagi semua IP address. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html.
+  SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow all IP address to port TCP 8080, SSH, and ICMP
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: icmp
+        FromPort: -1
+        ToPort: -1
+        CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value: MySecurityGroup
+
+#----------------------------------------------------------------------------------------#
+Outputs:
+  EC2ID:
+    Value:
+      Ref: EC2
+    Description: EC2 ID
+
+# Ekstrak informasi public DNS dan public IPv4 address milik EC2 instance. Public DNS dan IPv4-nya tetap berlaku, meskipun EC2-nya dihidupkan kembali. Hal ini karena EC2 instance menggunakan ElasticIP yang sifatnya static.
+  EC2PublicIP:
+    Value:
+      Fn::GetAtt: EC2.PublicIp
+    Description: Public IPv4 of EC2
+
+# Membuat link untuk akses ke Jenkins menggunakan port 8080. Fn::Join menggabungkan Public DNS milik EC2 instance dan teks "8080" dengan tanda ":" sebagai pemisah.
+  JenkinsURL:
+    Value:
+      Fn::Join: [":", [Fn::GetAtt: EC2.PublicDnsName, "8080"]]
+    Description: URL of Jenkins Instance
+
+# Membuat link untuk akses remote ke EC2 instance via EC2 Instance Connect. Teks "ec2-user" pada link merupakan user didalam OS Amazon Linux 2 yang digunakan untuk remote. Informasi lebih lanjut ada disini https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
+  InstanceConnectURL:
+    Value:
+      Fn::Join: ["", ["https://console.aws.amazon.com/ec2/v2/connect/ec2-user/", Ref: EC2]]
+    Description: URL of EC2 Instance Connect
