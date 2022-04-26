@@ -4,7 +4,6 @@ Description: >
 
 #----------------------------------------------------------------------------------------#
 Parameters:
-# User memilih instance type yang nanti digunakan oleh EC2 instance, atau bisa menggunakan default value.
   InstanceType:
     Type: String
     Default: t3.micro
@@ -14,25 +13,20 @@ Parameters:
       - t3a.medium
     Description: Select instance type for EC2 instance. The default value is t3.micro.
 
-# User memilih SSH keypair untuk remote ke EC2 instance.
   SSHKeypair:
     Type: AWS::EC2::KeyPair::KeyName
     Description: Select existing EC2 KeyPair for remote SSH.
 
 #----------------------------------------------------------------------------------------#
 Resources:
-# Buat EC2 instance dengan pilihan AMI, instance type, security group, keypair, user data, dan tag. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-instance.html.
   EC2:
     Type: AWS::EC2::Instance
     Properties:
-# Gunakan AMI ID milik Amazon Linux 2 terbaru yang diambil dari System Manager - Parameter Store yang disediakan oleh AWS.
-      ImageId: '{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}'
+      ImageId: "{{resolve:ssm:/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2}}"
       InstanceType:
         Ref: InstanceType
-# Pasang SecurityGroup yang dibuat ke EC2 instance.
       SecurityGroups:
         - Ref: SecurityGroup
-# Gunakan SSH keypair yang dipilih oleh user.
       KeyName:
         Ref: SSHKeypair
       UserData:
@@ -42,11 +36,10 @@ Resources:
           # Get the latest CloudFormation package
           yum update -y aws-cfn-bootstrap
           # Start cfn-init
-          /opt/aws/bin/cfn-init -s ${AWS::StackId} -r MyInstance --region ${AWS::Region} || error_exit 'Failed to run cfn-init'
-# Pasang tag untuk EC2 instance.
+          /opt/aws/bin/cfn-init -s ${AWS::StackId} -r MyInstance --region ${AWS::Region} || error_exit "Failed to run cfn-init"
       Tags:
       - Key: Name
-        Value: MyJenkins
+        Value: EC2-Cfn-Init
       - Key: OS
         Value: Amazon Linux 2
 # Script yang digunakan oleh CloudFormation init untuk mengkonfigurasi instance. Rincian strukturnya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-init.html.
@@ -62,17 +55,16 @@ Resources:
               content: |
                 <h1>Hello World from EC2 instance!</h1>
                 <p>This was created using cfn-init</p>
-              mode: '000644'
+              mode: "000644"
           commands:
             hello:
               command: "yum update -y"
           services:
             sysvinit:
               httpd:
-                enabled: 'true'
-                ensureRunning: 'true'
+                enabled: "true"
+                ensureRunning: "true"
 
-# Buat elastic IP dan pasang ke EC2 instance. Public IPv4 address ini tidak akan berubah meskipun EC2 instance-nya dimatikan lalu dihidupkan. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-eip.html.
   EIP:
     Type: AWS::EC2::EIP
     Properties:
@@ -82,15 +74,14 @@ Resources:
       - Key: Name
         Value: MyEIP
 
-# Buat security group yang membolehkan akses TCP 8080 (untuk Jenkins), SSH (untuk remote), and ICMP (untuk ping) bagi semua IP address. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-security-group.html.
   SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Allow all IP address to port TCP 8080, SSH, and ICMP
+      GroupDescription: Allow all IP address to port HTTP, SSH and ICMP
       SecurityGroupIngress:
       - IpProtocol: tcp
-        FromPort: 8080
-        ToPort: 8080
+        FromPort: 80
+        ToPort: 80
         CidrIp: 0.0.0.0/0
       - IpProtocol: tcp
         FromPort: 22
@@ -111,20 +102,22 @@ Outputs:
       Ref: EC2
     Description: EC2 ID
 
-# Ekstrak informasi public DNS dan public IPv4 address milik EC2 instance. Public DNS dan IPv4-nya tetap berlaku, meskipun EC2-nya dihidupkan kembali. Hal ini karena EC2 instance menggunakan ElasticIP yang sifatnya static.
+  EC2PublicDNS:
+    Value:
+      Fn::GetAtt: EC2.PublicDnsName
+    Description: Public DNS Endpoint of EC2
+
   EC2PublicIP:
     Value:
       Fn::GetAtt: EC2.PublicIp
     Description: Public IPv4 of EC2
 
-# Membuat link untuk akses ke Jenkins menggunakan port 8080. Fn::Join menggabungkan Public DNS milik EC2 instance dan teks "8080" dengan tanda ":" sebagai pemisah.
-  JenkinsURL:
+  EC2PrivateIP:
     Value:
-      Fn::Join: [":", [Fn::GetAtt: EC2.PublicDnsName, "8080"]]
-    Description: URL of Jenkins Instance
+      Fn::GetAtt: EC2.PrivateIp
+    Description: Private IPv4 of EC2
 
-# Membuat link untuk akses remote ke EC2 instance via EC2 Instance Connect. Teks "ec2-user" pada link merupakan user didalam OS Amazon Linux 2 yang digunakan untuk remote. Informasi lebih lanjut ada disini https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
-  InstanceConnectURL:
+  RemoteEC2:
     Value:
-      Fn::Join: ["", ["https://console.aws.amazon.com/ec2/v2/connect/ec2-user/", Ref: EC2]]
-    Description: URL of EC2 Instance Connect
+      Fn::Join: [ "", [ "https://console.aws.amazon.com/systems-manager/session-manager/", Ref: EC2, "?region=", Ref: AWS::Region ]]
+    Description: Remote EC2 via System Manager - Session Manager
