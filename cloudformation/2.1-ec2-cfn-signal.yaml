@@ -1,18 +1,18 @@
 Description: >
-  Jenkins CI/CD instance dengan permission ke Code Services.
-# Jenkins merupakan aplikasi open-source yang menyediakan mekanisme continuous integration dan continuous delivery (CI/CD) secara otomatis yang diperlukan oleh developer. Informasi lebih lanjut ada disini https://www.jenkins.io.
+  EC2 instance dengan cfn-init.
+# Membuat instance menggunakan cfn-init (atau CloudFormation init). CloudFormation init merupakan program yang bisa dieksekusi (via instance user data) untuk mengkonfigurasi instance menggunakan script yang ada dibagian Metadata -> AWS::CloudFormation::Init. Informasi lebih lanjut ada disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html.
 
 #----------------------------------------------------------------------------------------#
 Parameters:
+# User memilih instance type yang nanti digunakan oleh EC2 instance, atau bisa menggunakan default value.
   InstanceType:
     Type: String
-    Default: t3a.small
+    Default: t3.micro
     AllowedValues:
       - t3.micro
       - t3a.small
       - t3a.medium
-      - t3a.large
-    Description: Select instance type for EC2 instance. The default value is t3a.small.
+    Description: Select instance type for EC2 instance. The default value is t3.micro.
 
 # User memilih SSH keypair untuk remote ke EC2 instance.
   SSHKeypair:
@@ -35,62 +35,52 @@ Resources:
 # Gunakan SSH keypair yang dipilih oleh user.
       KeyName:
         Ref: SSHKeypair
-# Gunakan instance profile yang terhubung dengan IAM role yang dibuat (artinya EC2 memakai IAM role melalui instance profile).
-      IamInstanceProfile:
-        Ref: EC2ProfileforSSM
       UserData:
-# Download dan install Jenkins kedalam EC2 instance.
+# Update CloudFormation package, lalu eksekusi /opt/aws/bin/cfn-init (atau CloudFormation init). CloudFormation init akan mengkonfigurasi instance menggunakan script yang ada dibagian Metadata -> AWS::CloudFormation::Init.
         Fn::Base64: |
-          #!/bin/bash
-          yum update -y     
-          wget -O /etc/yum.repos.d/jenkins.repo http://pkg.jenkins-ci.org/redhat/jenkins.repo
-          rpm --import https://pkg.jenkins.io/redhat/jenkins.io.key
-          amazon-linux-extras install epel
-          yum install java-11 -y
-          yum install jenkins -y
-          echo "jenkins ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-          service jenkins start
-          systemctl enable jenkins
-      Tags: 
+          #!/bin/bash -xe
+          # Get the latest CloudFormation package
+          yum update -y aws-cfn-bootstrap
+          # Start cfn-init
+          /opt/aws/bin/cfn-init -s ${AWS::StackId} -r MyInstance --region ${AWS::Region} || error_exit 'Failed to run cfn-init'
+          # Start cfn-signal to the wait condition
+          /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource WaitCondition --region ${AWS::Region}
+
+# Pasang tag untuk EC2 instance.
+      Tags:
       - Key: Name
-        Value: Jenkins
+        Value: MyJenkins
       - Key: OS
         Value: Amazon Linux 2
+# Script yang digunakan oleh CloudFormation init untuk mengkonfigurasi instance. Rincian strukturnya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-init.html.
+    Metadata:
+      Comment: Install a simple Apache HTTP page
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              httpd: []
+          files:
+            "/var/www/html/index.html":
+              content: |
+                <h1>Hello World from EC2 instance!</h1>
+                <p>This was created using cfn-init</p>
+              mode: '000644'
+          commands:
+            hello:
+              command: "yum update -y"
+          services:
+            sysvinit:
+              httpd:
+                enabled: 'true'
+                ensureRunning: 'true'
 
-# Buat IAM role yang membolehkan agar:
-# - SSM agent didalam EC2 bisa dikontrol oleh AWS System Manager.
-# - Jenkins akses CodeCommit, atau CodeBuild dengan akses yang terbatas.
-
-  EC2RoleforSSM:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument: 
-        Statement: 
-          - Effect: Allow
-            Principal: 
-              Service:
-                - ec2.amazonaws.com
-            Action: 
-              - sts:AssumeRole
-      ManagedPolicyArns: 
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
-        - arn:aws:iam::aws:policy/AWSCodeCommitReadOnly
-        - arn:aws:iam::aws:policy/AWSCodeBuildDeveloperAccess
-        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
-      Path: "/"
-      Tags: 
-      - Key: Name
-        Value:
-          Fn::Sub: Lab - Jenkins Role
-
-# Buat instance profile yang terhubung dengan IAM role. IAM role tidak akan dipasang secara langsung ke EC2 instance, melainkan instance profile yang akan dipasang. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-iam-instanceprofile.html.
-  EC2ProfileforSSM:
-    Type: AWS::IAM::InstanceProfile
-    Properties: 
-      Path: "/"
-      Roles: 
-        - Ref: EC2RoleforSSM
-
+  WaitCondition:
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT5M
+        Count: 1
+    Type: AWS::CloudFormation::WaitCondition
 
 # Buat elastic IP dan pasang ke EC2 instance. Public IPv4 address ini tidak akan berubah meskipun EC2 instance-nya dimatikan lalu dihidupkan. Rincian propertinya bisa lihat disini https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-ec2-eip.html.
   EIP:
@@ -122,7 +112,7 @@ Resources:
         CidrIp: 0.0.0.0/0
       Tags:
       - Key: Name
-        Value: Lab - Jenkins SecurityGroup
+        Value: MySecurityGroup
 
 #----------------------------------------------------------------------------------------#
 Outputs:
@@ -143,12 +133,8 @@ Outputs:
       Fn::Join: [":", [Fn::GetAtt: EC2.PublicDnsName, "8080"]]
     Description: URL of Jenkins Instance
 
-# Membuat link untuk akses remote ke EC2 instance via System Manager - Session Manager. EC2 memiliki SSM agent dan IAM role yang cukup untuk melakukan akses remote.
-  RemoteEC2:
+# Membuat link untuk akses remote ke EC2 instance via EC2 Instance Connect. Teks "ec2-user" pada link merupakan user didalam OS Amazon Linux 2 yang digunakan untuk remote. Informasi lebih lanjut ada disini https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connection-prereqs.html
+  InstanceConnectURL:
     Value:
-# Menggabungkan beberapa text untuk menampilkan link untuk akses remote, seperti:
-# 1. URL System Manager - Session Manager yang sifatnya tidak berubah di region manapun.
-# 2. ID dari EC2 yang ingin di remote. ID diambil dari EC2 yang dibuat.
-# 3. Region ID yang akan berubah-berubah ketika template ini dieksekusi di region yang berbeda.
-      Fn::Join: [ "", [ "https://console.aws.amazon.com/systems-manager/session-manager/", Ref: EC2, "?region=", Ref: AWS::Region ]]
-    Description: Remote EC2 via System Manager - Session Manager
+      Fn::Join: ["", ["https://console.aws.amazon.com/ec2/v2/connect/ec2-user/", Ref: EC2]]
+    Description: URL of EC2 Instance Connect
