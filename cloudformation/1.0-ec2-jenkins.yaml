@@ -6,9 +6,10 @@ Description: >
 Parameters:
   InstanceType:
     Type: String
-    Default: t3a.small
+    Default: t3.micro
     AllowedValues:
       - t3.micro
+      - t3a.micro
       - t3a.small
       - t3a.medium
       - t3a.large
