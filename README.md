@@ -18,7 +18,7 @@ _[DISCLAIMER] The links and materials provided here are for supplementary study 
 ### 3. Exam Readiness
 - [Exam Readiness: AWS Certified DevOps Engineer – Professional](https://explore.skillbuilder.aws/learn/course/external/view/elearning/74/exam-readiness-aws-certified-devops-engineer-professional)
 - [AWS Certified DevOps Engineer - Professional (DOP-C02) Sample Exam Questions](https://d1.awsstatic.com/training-and-certification/docs-devops-pro/AWS-Certified-DevOps-Engineer-Professional_Sample-Questions.pdf)
-- [Udemy: AWS Certified DevOps Engineer Professional 2026 - DOP-C02](https://www.udemy.com/course/aws-certified-devops-engineer-professional-hands-on/) **Paid**
+- [Udemy: Practice Exams | AWS Certified DevOps Engineer Professional](https://www.udemy.com/course/aws-certified-devops-engineer-professional-practice-exam-dop/) **Paid**
 - [Examtopics: Amazon AWS Certified DevOps Engineer - Professional DOP-C02 Exam](https://www.examtopics.com/exams/amazon/aws-certified-devops-engineer-professional-dop-c02/view/) **Paid**
 
     > Multiple sample questions to help you get familiar with the question format for the exam.
