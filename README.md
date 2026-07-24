@@ -16,7 +16,7 @@ _[DISCLAIMER] The links and materials provided here are for supplementary study 
     > This guide discusses the 6 domains/sections that will be covered in the exam. You can use it to identify any points you don't understand for further study.
 
 ### 3. Exam Readiness
-- [Exam Readiness: AWS Certified DevOps Engineer – Professional](https://explore.skillbuilder.aws/learn/course/external/view/elearning/74/exam-readiness-aws-certified-devops-engineer-professional)
+- [Exam Prep Plan: AWS Certified DevOps Engineer - Professional (DOP-C02 - English)](https://skillbuilder.aws/learning-plan/2PTQME1CCS/exam-prep-plan-aws-certified-devops-engineer--professional-dopc02--english/724EJD3G8X)
 - [AWS Certified DevOps Engineer - Professional (DOP-C02) Sample Exam Questions](https://d1.awsstatic.com/training-and-certification/docs-devops-pro/AWS-Certified-DevOps-Engineer-Professional_Sample-Questions.pdf)
 - [Udemy: Practice Exams | AWS Certified DevOps Engineer Professional](https://www.udemy.com/course/aws-certified-devops-engineer-professional-practice-exam-dop/) **Paid**
 - [Examtopics: Amazon AWS Certified DevOps Engineer - Professional DOP-C02 Exam](https://www.examtopics.com/exams/amazon/aws-certified-devops-engineer-professional-dop-c02/view/) **Paid**
